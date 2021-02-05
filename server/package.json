@@ -1,36 +1,41 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "description": "Server cod for task scheduler",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest --verbose"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/snghnishant/TaskScheduler.git"
-  },
-  "keywords": [
-    "Task",
-    "Scheduler"
-  ],
-  "author": "Nishant Singh",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/snghnishant/TaskScheduler/issues"
-  },
-  "homepage": "https://github.com/snghnishant/TaskScheduler#readme",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "helmet": "^4.4.1",
-    "mongoose": "^5.11.15",
-    "morgan": "^1.10.0"
-  },
-  "devDependencies": {
-    "eslint": "^7.19.0",
-    "jest": "^26.6.3",
-    "nodemon": "^2.0.7"
-  }
+	"name": "api",
+	"version": "1.0.0",
+	"description": "Server cod for task scheduler",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"debug": "node --inspect index.js",
+		"devStart": "nodemon index.js",
+		"test": "jest --verbose"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/snghnishant/TaskScheduler.git"
+	},
+	"keywords": [
+		"Task",
+		"Scheduler"
+	],
+	"author": "Nishant Singh",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/snghnishant/TaskScheduler/issues"
+	},
+	"homepage": "https://github.com/snghnishant/TaskScheduler#readme",
+	"dependencies": {
+		"bcrypt": "^5.0.0",
+		"cors": "^2.8.5",
+		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"helmet": "^4.4.1",
+		"mongoose": "^5.11.15",
+		"mongoose-unique-validator": "^2.0.3",
+		"morgan": "^1.10.0"
+	},
+	"devDependencies": {
+		"eslint": "^7.19.0",
+		"jest": "^26.6.3",
+		"nodemon": "^2.0.7"
+	}
 }

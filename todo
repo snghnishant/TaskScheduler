@@ -1,0 +1,5 @@
+- Authentication and Authorization (JWT)
+- User only task CRUD
+- Protect API
+- Admin dashboard (with API access enabled)
+- secure header details
