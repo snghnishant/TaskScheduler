@@ -11,10 +11,6 @@ const taskSchema = new mongoose.Schema({
         type: String,
         maxLength: 200
     },
-    priority: {
-        type: Number,
-        required: true
-    },
     date: Date,
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,6 +1,15 @@
 const router = require("express").Router();
 const controller = require("../controllers/controller"); 
 
+
+/**
+ *  Login route
+ */
+
+// account login
+router.post("/login", controller.userLogin);
+
+
 /**
  * USER ROUTES
  */

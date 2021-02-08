@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const router = require("./routes/route");
 const config = require("./utility/config");
 const logger = require("./utility/logger");
+const middleware = require("./utility/middleware");
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.use(morgan("tiny"));
 
 app.use("/api", router);
 
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 module.exports = app;
 
