@@ -22,8 +22,11 @@ router.post("/users", controller.registerUser);
  * TASK ROUTES
  */
 
-// get all task by users
+// get all task by user
 router.get("/tasks", controller.getUserTasks);
+
+//get a single task by user
+router.get("/tasks/:id", controller.getSingleUserTask);
 
 // create new task
 router.post("/tasks", controller.addNewTask);

@@ -4,19 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../utility/config");
 
-
-/**
- * Helper function for grabbing the authorization token from incoming request
- * @param {*} req 
- */
-const getTokenFrom = req => {
-    const authorization = req.get("authorization");
-    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
-        return authorization.substring(7);
-    }
-    return null;
-};
-
 /**
  * Create new user account in the database
  * @param {*} req 
@@ -39,7 +26,7 @@ const registerUser = async (req, res) => {
 };
 
 /**
- * Logging in the user
+ * User sign in
  * @param {*} req 
  * @param {*} res 
  */
@@ -76,17 +63,28 @@ const userLogin = async (req, res) => {
 const getUserTasks = async (req, res) => {
 
     // verify logged-in user
-    const token = getTokenFrom(req);
-    const decodedToken = jwt.verify(token, config.SECRET);
-    if (!token || !decodedToken.id) {
+    const decodedToken = jwt.verify(req.token, config.SECRET);
+    if (!req.token || !decodedToken.id) {
         return res.status(401).json({ error: "Invalid authorization token" });
     }
 
     // Query tasks by the user
-    Task.find({ user: decodedToken._id }).then(returnedData => res.json(returnedData)).catch(error => error.message);
-    
+    const returnedData = await Task.find({ user: decodedToken._id });
+    res.json(returnedData);
     /* Other method to query task could be to get the user details with populate method of mongoose but it would be inefficient since mongoose do that by running multiple queries internally to the mongodb database
     */
+};
+
+const getSingleUserTask = async (req, res) => {
+    //verify logged in user
+    const decodedToken = jwt.verify(req.token, config.SECRET);
+    if (!req.token || !decodedToken.id) {
+        return res.status(401).json({ error: "Invalid authorization token" });
+    }
+
+    const id = req.params.id;
+    const returnedData = await Task.findOne({_id:id, user: decodedToken._id});
+    res.json(returnedData);
 };
 
 /**
@@ -94,13 +92,12 @@ const getUserTasks = async (req, res) => {
  * @param {*} req 
  * @param {*} res 
  */
-const addNewTask = async (req, res, next) => {
+const addNewTask = async (req, res) => {
     const body = req.body;
 
     // verify logged-in user
-    const token = getTokenFrom(req);
-    const decodedToken = jwt.verify(token, config.SECRET);
-    if (!token || !decodedToken.id) {
+    const decodedToken = jwt.verify(req.token, config.SECRET);
+    if (!req.token || !decodedToken.id) {
         return res.status(401).json({ error: "Invalid authorization token" });
     }
 
@@ -114,14 +111,11 @@ const addNewTask = async (req, res, next) => {
     });
 
     // save newly created task to Tasks list
-    await task.save().then(savedTask => {
-        // Add task id to user task array
-        user.tasks = user.tasks.concat(savedTask._id);
-        user.save();
-        return res.json(savedTask);
-    }).catch(error => {
-        next(error);
-    });
+    const savedTask = await task.save();
+    // Add task id to user task array
+    user.tasks = user.tasks.concat(savedTask._id);
+    await user.save();
+    res.json(savedTask);
 };
 
 /**
@@ -129,13 +123,12 @@ const addNewTask = async (req, res, next) => {
  * @param {*} req 
  * @param {*} res 
  */
-const updateTask = async(req, res, next) => {
+const updateTask = async(req, res) => {
     const body = req.body;
     const id = req.params.id;
     // verify logged-in user
-    const token = getTokenFrom(req);
-    const decodedToken = jwt.verify(token, config.SECRET);
-    if (!token || !decodedToken.id) {
+    const decodedToken = jwt.verify(req.token, config.SECRET);
+    if (!req.token || !decodedToken.id) {
         return res.status(401).json({error: "Invalid authorization token"});
     }
 
@@ -145,35 +138,32 @@ const updateTask = async(req, res, next) => {
         date: new Date()
     };
     // Find the task to update
-    await Task.findOneAndUpdate({ _id: id, user: decodedToken.id }, task, { new: true }).then(updatedTask => res.json(updatedTask)).catch(error => {
-        next(error);
-    });
+    const updatedTask = await Task.findOneAndUpdate({ _id: id, user: decodedToken.id }, task, { new: true });
+    res.json(updatedTask);
 };
 
 /**
  * Delete a task from DB
  * @param {*} req 
  * @param {*} res 
- * @param {*} next 
  */
-const deleteTask = (req, res, next) => {
+const deleteTask = async (req, res) => {
     const body = req.body;
     // verify logged-in user
-    const token = getTokenFrom(req);
-    const decodedToken = jwt.verify(token, config.SECRET);
-    if (!token || !decodedToken.id) {
+    const decodedToken = jwt.verify(req.token, config.SECRET);
+    if (!req.token || !decodedToken.id) {
         return res.status(401).json({ error: "Invalid authorization token" });
     }
     const id = body.id ?? req.params.id;
-    Task.findByIdAndRemove(id).then(() => {
-        res.status(204).end();
-    }).catch(error => next(error));
+    await Task.findByIdAndRemove(id);
+    res.status(204).end();
 };
 
 module.exports = {
     registerUser,
     userLogin,
     getUserTasks,
+    getSingleUserTask,
     addNewTask,
     updateTask,
     deleteTask

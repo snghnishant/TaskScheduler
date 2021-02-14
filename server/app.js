@@ -1,4 +1,5 @@
 const express = require("express");
+require("express-async-errors");
 const cors = require("cors");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -29,7 +30,7 @@ app.use(cors());
 //app.use(express.static("build"));
 app.use(express.json());
 app.use(morgan("tiny"));
-
+app.use(middleware.tokenExtractor);
 app.use("/api", router);
 
 app.use(middleware.unknownEndpoint);
